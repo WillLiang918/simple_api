@@ -1,8 +1,9 @@
-var jqueryParam = require('jquery-param');
-var rp = require('request-promise');
+const rp = require('request-promise');
+const urlBuilder = require('./utils/urlBuilder');
 
 module.exports = class SimpleApi {
-  constructor(headers, default_host = null) {
+
+  constructor(headers = {}, default_host = null) {
     this.default_host = default_host;
     this.headers = headers;
   }
@@ -12,30 +13,25 @@ module.exports = class SimpleApi {
   }
 
   get(path, params = {}) {
-    return this._query('GET', path, params);
+    return this._query('GET', path, null, params);
+  }
+
+  post(path, body = {}) {
+    return this._query('POST', path, body, {});
   }
 
   // Private Methods
 
-  _query(method, path, params) {
+  _query(method, path, body = null, params = {}) {
+
     var requestOptions = {
       method: method,
-      url: this._buildURL(path, params),
-      headers: this.headers
+      url: urlBuilder(path, params),
+      headers: this.headers,
+      body: body,
+      json: true,
     };
 
     return rp(requestOptions);
   }
-
-  _buildURL(path, parameters) {
-    var url;
-
-    if (this.default_host) {
-      url = this.default_host + path;
-    } else {
-      url = path;
-    };
-
-    return `${url}?${jqueryParam(parameters)}`;
-  }
-};
+}
