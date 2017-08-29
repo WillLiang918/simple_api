@@ -8,6 +8,7 @@ module.exports = class SimpleApi {
     this.headers = headers;
   }
 
+  // TODO: Ensure headers are immutable.
   updateHeader(header, value) {
     this.headers[header] = value;
   }
@@ -18,6 +19,10 @@ module.exports = class SimpleApi {
 
   post(path, body = {}) {
     return this._query('POST', path, body, {});
+  }
+
+  addEndpoint(customApiEvent, callback) {
+    this[customApiEvent] = callback;
   }
 
   // Private Methods
